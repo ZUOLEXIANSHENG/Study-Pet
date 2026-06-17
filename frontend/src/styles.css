@@ -1,0 +1,294 @@
+:root {
+  color-scheme: dark;
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(57, 139, 255, 0.18), transparent 24%),
+    radial-gradient(circle at 78% 72%, rgba(45, 212, 191, 0.14), transparent 20%),
+    linear-gradient(135deg, #07111d 0%, #0b1625 55%, #07131f 100%);
+  color: #e7eef9;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: transparent; }
+button, input, textarea { font: inherit; }
+#app { min-height: 100vh; }
+
+.pet-app {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+}
+
+.pet-scene {
+  position: relative;
+  width: min(100%, 1120px);
+  min-height: min(92vh, 920px);
+  display: grid;
+  place-items: center;
+}
+
+.picker-strip {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 999px;
+  background: rgba(4, 9, 18, 0.54);
+  backdrop-filter: blur(14px);
+  z-index: 4;
+}
+.picker-strip button {
+  min-width: 78px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #9fb0c5;
+  cursor: pointer;
+}
+.picker-strip button.active {
+  background: rgba(125, 211, 252, 0.16);
+  color: #e0f2fe;
+}
+
+.pet-name {
+  position: absolute;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  font-size: 15px;
+  color: #93c5fd;
+  letter-spacing: 0;
+}
+
+.main-pet {
+  position: relative;
+  z-index: 2;
+}
+
+.confirm-arrow {
+  position: absolute;
+  left: 50%;
+  bottom: 72px;
+  transform: translateX(-50%);
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 211, 252, 0.36);
+  background: rgba(10, 18, 30, 0.82);
+  color: #e0f2fe;
+  font-size: 32px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.action-bubbles {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+.action-bubble {
+  position: absolute;
+  min-width: 170px;
+  min-height: 58px;
+  padding: 14px 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  background: rgba(8, 14, 24, 0.88);
+  color: #e2e8f0;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+  pointer-events: auto;
+}
+.action-bubble.chat { left: 16%; top: 34%; }
+.action-bubble.plan { right: 16%; top: 34%; }
+.action-bubble.checkin { left: 50%; bottom: 17%; transform: translateX(-50%); }
+
+.pet-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.pet-stage canvas {
+  width: min(100%, 560px);
+  image-rendering: pixelated;
+  filter: drop-shadow(0 26px 34px rgba(0, 0, 0, 0.42));
+}
+.pet-shadow {
+  position: absolute;
+  left: 24%;
+  right: 24%;
+  bottom: 11%;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.34);
+  filter: blur(12px);
+}
+
+.module-panel {
+  position: fixed;
+  right: 26px;
+  bottom: 22px;
+  width: min(450px, calc(100vw - 40px));
+  max-height: min(80vh, 760px);
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  background: rgba(7, 13, 23, 0.94);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38);
+}
+.module-panel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.module-panel header p {
+  margin: 0;
+  color: #93c5fd;
+}
+.module-panel header button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.78);
+  color: #e2e8f0;
+  cursor: pointer;
+}
+
+.chat-log,
+.plan-result,
+.checkin-list {
+  display: grid;
+  gap: 10px;
+}
+.chat-line {
+  padding: 12px 14px;
+  border-radius: 14px;
+  line-height: 1.6;
+}
+.chat-line.user { background: rgba(30, 41, 59, 0.92); }
+.chat-line.assistant { background: rgba(15, 118, 110, 0.24); }
+.empty-line,
+.module-message {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.composer,
+.plan-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+.composer textarea,
+.plan-form input,
+.plan-item input {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #e2e8f0;
+  padding: 12px 14px;
+  outline: none;
+}
+.plan-refresh {
+  min-height: 42px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.78);
+  color: #e2e8f0;
+  cursor: pointer;
+}
+.composer button,
+.plan-form button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 14px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}
+.composer button:disabled,
+.plan-form button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.plan-item,
+.week-item,
+.checkin-summary {
+  display: grid;
+  gap: 8px;
+}
+.week-item {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(14, 116, 144, 0.18);
+}
+.plan-item {
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+}
+.plan-item span,
+.checkin-summary span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+.checkin-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.checkin-summary > div {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.78);
+}
+.checkin-summary strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 18px;
+}
+.checkin-list > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.76);
+}
+
+@media (max-width: 900px) {
+  .pet-scene { min-height: 88vh; }
+  .action-bubble.chat { left: 6%; top: 30%; }
+  .action-bubble.plan { right: 6%; top: 30%; }
+  .action-bubble.checkin { bottom: 12%; }
+  .module-panel {
+    right: 14px;
+    left: 14px;
+    width: auto;
+    bottom: 14px;
+  }
+  .checkin-summary,
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
