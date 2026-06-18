@@ -75,12 +75,13 @@ const animationDefs: Record<
 }
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
-const image = new Image()
+const activeImage = ref<HTMLImageElement | null>(null)
 const loadedFrames = ref(1)
 const loadedColumns = ref(1)
 let raf = 0
 let start = 0
 let loaded = false
+let loadToken = 0
 
 const meta = computed(() => characterMeta[props.companionId])
 const config = computed(() => {
@@ -116,23 +117,51 @@ function render(timestamp: number) {
 
   ctx.clearRect(0, 0, frameW, frameH)
   ctx.imageSmoothingEnabled = false
-  ctx.drawImage(image, sx, sy, frameW, frameH, 0, 0, frameW, frameH)
+  if (!activeImage.value) {
+    raf = requestAnimationFrame(render)
+    return
+  }
+
+  ctx.drawImage(activeImage.value, sx, sy, frameW, frameH, 0, 0, frameW, frameH)
   raf = requestAnimationFrame(render)
 }
 
 function loadSprite() {
+  const token = ++loadToken
+  const nextConfig = config.value
+  const nextImage = new Image()
   loaded = false
   start = 0
   loadedFrames.value = 1
   loadedColumns.value = 1
-  image.onload = () => {
-    const sheetColumns = Math.max(1, Math.floor(image.naturalWidth / config.value.frameWidth))
-    const sheetRows = Math.max(1, Math.floor(image.naturalHeight / config.value.frameHeight))
+
+  nextImage.onload = () => {
+    if (token !== loadToken) return
+    const sheetColumns = Math.max(1, Math.floor(nextImage.naturalWidth / nextConfig.frameWidth))
+    const sheetRows = Math.max(1, Math.floor(nextImage.naturalHeight / nextConfig.frameHeight))
     loadedColumns.value = sheetColumns
-    loadedFrames.value = Math.min(config.value.frames, sheetColumns * sheetRows)
+    loadedFrames.value = Math.min(nextConfig.frames, sheetColumns * sheetRows)
+    activeImage.value = nextImage
     loaded = true
   }
-  image.src = config.value.src
+
+  nextImage.onerror = () => {
+    if (token !== loadToken) return
+    if (props.companionId === 'cafe') return
+    const fallback = new Image()
+    fallback.onload = () => {
+      if (token !== loadToken) return
+      const sheetColumns = Math.max(1, Math.floor(fallback.naturalWidth / characterMeta.cafe.frameWidth))
+      const sheetRows = Math.max(1, Math.floor(fallback.naturalHeight / characterMeta.cafe.frameHeight))
+      loadedColumns.value = sheetColumns
+      loadedFrames.value = Math.min(animationDefs.idle.frames.cafe, sheetColumns * sheetRows)
+      activeImage.value = fallback
+      loaded = true
+    }
+    fallback.src = '/assets/companion/cafe/idle.png'
+  }
+
+  nextImage.src = nextConfig.src
 }
 
 watch(() => [props.action, props.companionId], loadSprite)

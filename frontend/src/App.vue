@@ -24,6 +24,10 @@
         </button>
       </div>
 
+      <button v-else class="reselect-button" type="button" @click="handleReselect">
+        Reselect pet
+      </button>
+
       <div class="pet-stage-shell">
         <div class="stage-ring stage-ring-one" />
         <div class="stage-ring stage-ring-two" />
@@ -246,6 +250,12 @@ function handlePetTap() {
     return
   }
   store.openModule('chat')
+}
+
+function handleReselect() {
+  timerRunning.value = false
+  window.clearInterval(timerId)
+  store.reselectCompanion()
 }
 
 function toggleTimer() {

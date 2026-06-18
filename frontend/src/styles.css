@@ -162,6 +162,28 @@ textarea:focus-visible {
   box-shadow: 0 10px 26px rgba(83, 93, 117, 0.13);
 }
 
+.reselect-button {
+  position: absolute;
+  top: 28px;
+  right: 24px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.54);
+  color: #344054;
+  cursor: pointer;
+  backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 16px 40px rgba(83, 93, 117, 0.12);
+  transition: transform 180ms ease, background 180ms ease;
+  z-index: 9;
+}
+
+.reselect-button:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.78);
+}
+
 .pet-stage-shell {
   position: relative;
   width: min(72vw, 720px);
@@ -862,6 +884,11 @@ textarea:focus-visible {
   .picker-strip {
     top: 86px;
     border-radius: 24px;
+  }
+
+  .reselect-button {
+    top: 78px;
+    right: 18px;
   }
 
   .pet-stage-shell {

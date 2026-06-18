@@ -114,6 +114,12 @@ export const useStudyStore = defineStore('study', {
       this.companionAction = 'happy'
       this.companionMessage = companionProfiles[this.companionId].greeting
     },
+    reselectCompanion() {
+      this.selected = false
+      this.activeModule = null
+      this.companionAction = 'idle'
+      this.companionMessage = companionProfiles[this.companionId].greeting
+    },
     openModule(module: Exclude<ActiveModule, null>) {
       this.activeModule = module
       if (module === 'chat') this.companionAction = 'comfort'
