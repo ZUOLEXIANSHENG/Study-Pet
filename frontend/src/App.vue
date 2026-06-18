@@ -1,286 +1,349 @@
 <template>
-  <main class="pet-app" :data-mode="store.selected ? 'dashboard' : 'select'">
-    <div class="studio-glow studio-glow-a" />
-    <div class="studio-glow studio-glow-b" />
+  <main class="studypet-shell">
+    <div class="ambient ambient-one" />
+    <div class="ambient ambient-two" />
+    <div class="ambient ambient-three" />
 
-    <section class="pet-scene" aria-labelledby="app-title">
-      <div class="brand-mark">
-        <span class="brand-orbit" aria-hidden="true" />
-        <div>
-          <h1 id="app-title">StudyPet</h1>
-          <p>{{ store.selected ? store.currentCompanionName : 'Choose your companion' }}</p>
-        </div>
-      </div>
-
-      <div v-if="!store.selected" class="picker-strip" aria-label="选择桌宠">
-        <button
-          v-for="companion in store.companions"
-          :key="companion.id"
-          type="button"
-          :class="{ active: store.companionId === companion.id }"
-          @click="store.selectCompanion(companion.id)"
-        >
-          {{ companion.name }}
-        </button>
-      </div>
-
-      <button v-else class="reselect-button" type="button" @click="handleReselect">
-        Reselect pet
+    <header class="topbar glass-card">
+      <button class="brand" type="button" @click="activePage = 'home'" aria-label="Open StudyPet home">
+        <span class="brand-glyph">S</span>
+        <span>StudyPet</span>
       </button>
 
-      <div class="pet-stage-shell">
-        <div class="stage-ring stage-ring-one" />
-        <div class="stage-ring stage-ring-two" />
-        <div class="pet-message" :class="{ visible: store.selected || store.activeModule === 'chat' }">
-          {{ store.companionMessage }}
-        </div>
-        <CompanionSprite
-          class="main-pet"
-          :companion-id="store.companionId"
-          :action="store.companionAction"
-          @select="handlePetTap"
-        />
+      <div class="daily-greeting">
+        <strong>Good Afternoon, Xiaoming</strong>
+        <span>Today is another day of growth.</span>
       </div>
 
-      <button v-if="!store.selected" class="confirm-arrow" type="button" aria-label="确认桌宠" @click="store.confirmCompanion">
-        <span aria-hidden="true">›</span>
-      </button>
+      <div class="topbar-actions">
+        <button class="bell-button" type="button" aria-label="Notifications">
+          <span class="bell-icon" />
+        </button>
+        <div class="level-chip">
+          <span>Lv. 12</span>
+          <i><b /></i>
+        </div>
+        <div class="user-avatar" aria-label="User avatar">XM</div>
+      </div>
+    </header>
 
-      <nav v-else class="glass-dock" aria-label="StudyPet modules">
-        <button type="button" :class="{ active: store.activeModule === 'chat' }" @click="store.openModule('chat')">
-          <span class="dock-icon chat-icon" aria-hidden="true" />
-          <span>AI Pet Chat</span>
-        </button>
-        <button type="button" :class="{ active: store.activeModule === 'plan' }" @click="store.openModule('plan')">
-          <span class="dock-icon plan-icon" aria-hidden="true" />
-          <span>Study Planner</span>
-        </button>
-        <button type="button" :class="{ active: store.activeModule === 'checkin' }" @click="store.openModule('checkin')">
-          <span class="dock-icon focus-icon" aria-hidden="true" />
-          <span>Focus Tracker</span>
-        </button>
-      </nav>
+    <nav class="page-tabs" aria-label="StudyPet pages">
+      <button
+        v-for="item in navItems"
+        :key="item.id"
+        type="button"
+        :class="{ active: activePage === item.id }"
+        @click="activePage = item.id"
+      >
+        {{ item.label }}
+      </button>
+    </nav>
+
+    <section v-if="activePage === 'home'" class="page home-page">
+      <section class="hero-grid">
+        <aside class="hero-left">
+          <div class="speech-bubble glass-card">
+            <span class="eyebrow">StudyPet says</span>
+            <p>You have studied for 12 consecutive days. Keep going. I believe in you.</p>
+          </div>
+
+          <div class="pet-info-card glass-card">
+            <div class="card-title-row">
+              <span class="eyebrow">Companion growth</span>
+              <strong>Level 12</strong>
+            </div>
+            <div class="metric-stack">
+              <div>
+                <span>EXP</span>
+                <strong>2,480 / 3,000</strong>
+              </div>
+              <div class="mini-progress"><i style="width: 82%" /></div>
+              <div>
+                <span>Growth status</span>
+                <strong>Focused and warm</strong>
+              </div>
+              <div>
+                <span>Next unlock</span>
+                <strong>Learning Analysis · 18%</strong>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="pet-hero" aria-label="StudyPet companion stage">
+          <div class="hero-light" />
+          <div class="floating-reward reward-one">+50 EXP</div>
+          <div class="floating-reward reward-two">+10 Motivation</div>
+          <div class="floating-reward reward-three">+1 Streak</div>
+          <StudyPetAvatar @chat="activePage = 'home'" />
+        </section>
+
+        <aside class="chat-panel glass-card">
+          <div class="card-title-row">
+            <div>
+              <span class="eyebrow">AI Chat</span>
+              <h2>Talk with StudyPet</h2>
+            </div>
+            <span class="online-dot" />
+          </div>
+          <div class="chat-list">
+            <p>How was your study today?</p>
+            <p>What made you proud today?</p>
+            <p>What challenge did you encounter?</p>
+          </div>
+          <div class="chat-input">
+            <input v-model="store.moodMessage" placeholder="Talk with StudyPet..." @keydown.enter.prevent="store.runMood" />
+            <button type="button" @click="store.runMood" :disabled="store.loading">Send</button>
+          </div>
+        </aside>
+      </section>
+
+      <section class="bottom-grid">
+        <article class="premium-card glass-card">
+          <div class="card-title-row">
+            <div>
+              <span class="eyebrow">Today</span>
+              <h2>Study Plan</h2>
+            </div>
+            <strong>67%</strong>
+          </div>
+          <div class="task-list">
+            <label v-for="task in todayTasks" :key="task.name">
+              <input type="checkbox" :checked="task.done" />
+              <span>{{ task.name }}</span>
+              <small>{{ task.time }}</small>
+            </label>
+          </div>
+          <div class="soft-progress"><i style="width: 67%" /></div>
+          <button class="soft-button" type="button" @click="activePage = 'planning'">Generate New AI Plan</button>
+        </article>
+
+        <article class="premium-card glass-card">
+          <div class="card-title-row">
+            <div>
+              <span class="eyebrow">Overview</span>
+              <h2>Learning Today</h2>
+            </div>
+            <span class="pulse-chip">On track</span>
+          </div>
+          <div class="overview-metrics">
+            <div><span>Study Duration</span><strong>2h 35m</strong></div>
+            <div><span>Tasks Completed</span><strong>6 / 9</strong></div>
+            <div><span>Current Streak</span><strong>12 days</strong></div>
+          </div>
+          <div class="weekly-line" aria-label="Weekly trend">
+            <i v-for="height in weeklyTrend" :key="height" :style="{ height: `${height}%` }" />
+          </div>
+          <button class="primary-button" type="button" @click="activePage = 'checkin'">Complete Today's Check-in</button>
+        </article>
+
+        <article class="premium-card glass-card">
+          <div class="card-title-row">
+            <div>
+              <span class="eyebrow">Calendar</span>
+              <h2>Study Rhythm</h2>
+            </div>
+            <strong>12 day streak</strong>
+          </div>
+          <div class="heatmap" aria-label="Monthly study intensity">
+            <span v-for="(cell, index) in heatmapCells" :key="index" :data-level="cell" />
+          </div>
+          <p class="muted-copy">Purple intensity shows your study energy across this month.</p>
+        </article>
+      </section>
     </section>
 
-    <aside class="chat-sheet glass-panel" :class="{ open: store.activeModule === 'chat' }" aria-label="AI Pet Chat">
-      <header class="panel-header">
-        <div>
-          <p>AI Pet Chat</p>
-          <span>{{ store.currentCompanionName }}</span>
-        </div>
-        <button type="button" class="icon-button" aria-label="关闭聊天" @click="store.closeModule">×</button>
-      </header>
+    <section v-else-if="activePage === 'planning'" class="page planning-page">
+      <aside class="side-rail glass-card">
+        <span class="eyebrow">Roadmap</span>
+        <h2>Personal growth plan</h2>
+        <p>Build a calm weekly rhythm that adapts to your exam date, weak subjects, and real available time.</p>
+        <div class="rail-stat"><span>Weekly focus</span><strong>8.5 h</strong></div>
+        <div class="rail-stat"><span>Risk level</span><strong>Low</strong></div>
+      </aside>
 
-      <div class="chat-log">
-        <div v-if="store.chatHistory.length === 0" class="empty-line">{{ store.companionMessage }}</div>
-        <div v-for="(turn, index) in store.chatHistory" :key="index" :class="['chat-line', turn.role]">
-          {{ turn.content }}
+      <section class="roadmap glass-card">
+        <div class="section-heading">
+          <span class="eyebrow">Weekly Study Roadmap</span>
+          <h1>Your next seven days</h1>
         </div>
-      </div>
+        <div class="timeline-board">
+          <article v-for="day in weekPlan" :key="day.day" class="day-column">
+            <h3>{{ day.day }}</h3>
+            <div
+              v-for="task in day.tasks"
+              :key="task.title"
+              class="roadmap-task"
+              draggable="true"
+            >
+              <strong>{{ task.title }}</strong>
+              <span>{{ task.meta }}</span>
+            </div>
+          </article>
+        </div>
+      </section>
 
-      <div class="composer">
-        <label for="mood-message">Message</label>
-        <textarea id="mood-message" v-model="store.moodMessage" rows="3" placeholder="说说你现在的状态" @keydown.ctrl.enter.prevent="store.runMood" />
-        <button type="button" @click="store.runMood" :disabled="store.loading">
-          {{ store.loading ? 'Sending' : 'Send' }}
+      <aside class="planner-assistant glass-card">
+        <span class="eyebrow">AI Planner</span>
+        <h2>Generate a personalized plan</h2>
+        <label><span>Grade</span><input v-model="planner.grade" placeholder="Senior 3" /></label>
+        <label><span>Exam Date</span><input v-model="planner.examDate" type="date" /></label>
+        <label><span>Target Score</span><input v-model="planner.targetScore" placeholder="620" /></label>
+        <label><span>Daily Available Time</span><input v-model="planner.availableTime" placeholder="2.5 hours" /></label>
+        <label><span>Weak Subjects</span><input v-model="planner.weakSubjects" placeholder="Math, Physics" /></label>
+        <button class="primary-button" type="button" @click="store.runPlan">Generate Personalized Plan</button>
+      </aside>
+    </section>
+
+    <section v-else-if="activePage === 'checkin'" class="page checkin-page">
+      <section class="streak-hero glass-card">
+        <span class="eyebrow">Current Study Streak</span>
+        <h1>12 Days</h1>
+        <p>Small promises kept daily become the life you are building.</p>
+      </section>
+
+      <section class="checkin-center">
+        <StudyPetAvatar @chat="activePage = 'growth'" />
+        <button class="checkin-button" type="button" @click="completeCheckin">
+          <span>Complete Today's Check-in</span>
         </button>
-      </div>
-    </aside>
-
-    <aside class="planner-drawer glass-panel" :class="{ open: store.activeModule === 'plan' }" aria-label="Study Planner">
-      <header class="panel-header">
-        <div>
-          <p>Study Planner</p>
-          <span>Daily tasks and weekly rhythm</span>
+        <div v-if="showCelebration" class="celebration-layer">
+          <span>+50 EXP</span>
+          <span>+10 Motivation</span>
+          <span>+1 Streak</span>
         </div>
-        <button type="button" class="icon-button" aria-label="关闭计划" @click="store.closeModule">×</button>
-      </header>
+      </section>
 
-      <form class="plan-form" @submit.prevent="store.runPlan">
-        <label>
-          <span>考试/科目</span>
-          <input v-model="store.examType" placeholder="高考数学" />
-        </label>
-        <label>
-          <span>目标</span>
-          <input v-model="store.goal" placeholder="30 天提到 85 分" />
-        </label>
-        <div class="form-row">
-          <label>
-            <span>目标分</span>
-            <input v-model.number="store.targetScore" type="number" min="0" max="750" />
-          </label>
-          <label>
-            <span>剩余天数</span>
-            <input v-model.number="store.daysLeft" type="number" min="1" />
-          </label>
+      <aside class="checkin-calendar glass-card">
+        <span class="eyebrow">Calendar</span>
+        <h2>June rhythm</h2>
+        <div class="heatmap large">
+          <span v-for="(cell, index) in heatmapCells" :key="`large-${index}`" :data-level="cell" />
         </div>
-        <label>
-          <span>当前水平</span>
-          <input v-model="store.currentLevel" placeholder="中等/薄弱" />
-        </label>
-        <button type="submit" class="primary-action" :disabled="store.loading">
-          {{ store.loading ? 'Generating' : 'Generate plan' }}
-        </button>
-      </form>
+      </aside>
 
-      <div class="weekly-progress" aria-label="Weekly Progress">
-        <div class="progress-copy">
-          <span>Weekly Progress</span>
-          <strong>{{ weeklyProgress }}%</strong>
-        </div>
-        <div class="progress-track">
-          <i :style="{ width: `${weeklyProgress}%` }" />
-        </div>
-      </div>
+      <section class="stats-strip">
+        <article class="glass-card"><span>Total Study Hours</span><strong>86.5</strong></article>
+        <article class="glass-card"><span>Completed Tasks</span><strong>142</strong></article>
+        <article class="glass-card"><span>Weekly Progress</span><strong>78%</strong></article>
+        <article class="glass-card"><span>Monthly Progress</span><strong>64%</strong></article>
+      </section>
+    </section>
 
-      <div class="timeline">
-        <div v-for="item in visiblePlanItems" :key="item.day" class="timeline-item">
-          <label class="task-check">
-            <input type="checkbox" />
-            <span />
-          </label>
-          <div>
-            <small>Day {{ item.day }}</small>
-            <input v-model="item.task" aria-label="编辑每日任务" />
+    <section v-else class="page growth-page">
+      <aside class="achievement-panel glass-card">
+        <span class="eyebrow">Achievements</span>
+        <h2>Built with you</h2>
+        <div v-for="item in achievements" :key="item.title" class="achievement-item">
+          <span>{{ item.icon }}</span>
+          <div><strong>{{ item.title }}</strong><small>{{ item.meta }}</small></div>
+        </div>
+      </aside>
+
+      <section class="growth-center glass-card">
+        <span class="eyebrow">My Learning Journey</span>
+        <h1>StudyPet is growing with you</h1>
+        <StudyPetAvatar @chat="activePage = 'home'" />
+        <div class="evolution-card">
+          <span>Current Evolution Stage</span>
+          <strong>Focused Companion · Level 12</strong>
+          <div class="soft-progress"><i style="width: 82%" /></div>
+        </div>
+      </section>
+
+      <aside class="abilities-panel glass-card">
+        <span class="eyebrow">Unlocked Abilities</span>
+        <h2>Companion skills</h2>
+        <div v-for="ability in abilities" :key="ability.title" class="ability-item" :class="{ locked: ability.locked }">
+          <strong>{{ ability.title }}</strong>
+          <span>{{ ability.meta }}</span>
+        </div>
+      </aside>
+
+      <section class="growth-timeline glass-card">
+        <span class="eyebrow">Growth Timeline</span>
+        <div class="milestone-row">
+          <div v-for="milestone in milestones" :key="milestone.level" class="milestone">
+            <span>{{ milestone.level }}</span>
+            <strong>{{ milestone.title }}</strong>
+            <small>{{ milestone.reward }}</small>
           </div>
         </div>
-      </div>
-
-      <div v-if="store.weeklyPlanItems.length" class="week-strip">
-        <div v-for="item in store.weeklyPlanItems" :key="`week-${item.week}`">
-          <span>Week {{ item.week }}</span>
-          <strong>{{ item.goal }}</strong>
-        </div>
-      </div>
-    </aside>
-
-    <aside class="focus-overlay glass-panel" :class="{ open: store.activeModule === 'checkin' }" aria-label="Focus Tracker">
-      <header class="panel-header">
-        <div>
-          <p>Focus Tracker</p>
-          <span>Check-in stays local</span>
-        </div>
-        <button type="button" class="icon-button" aria-label="关闭打卡" @click="store.closeModule">×</button>
-      </header>
-
-      <div class="timer-orb" :style="{ '--timer-progress': timerProgress }">
-        <div>
-          <span>{{ timerLabel }}</span>
-          <small>{{ timerRunning ? 'Focus session' : 'Ready to focus' }}</small>
-        </div>
-      </div>
-
-      <div class="timer-controls">
-        <button type="button" @click="toggleTimer">{{ timerRunning ? 'Pause' : 'Start' }}</button>
-        <button type="button" @click="resetTimer">Reset</button>
-      </div>
-
-      <div class="focus-stats">
-        <div>
-          <span class="stat-icon flame-icon" aria-hidden="true" />
-          <small>Streak</small>
-          <strong>{{ store.streakDays }} days</strong>
-        </div>
-        <div>
-          <span class="stat-icon pulse-icon" aria-hidden="true" />
-          <small>Today</small>
-          <strong>{{ store.todayStudyMinutes }} min</strong>
-        </div>
-      </div>
-
-      <form class="checkin-form" @submit.prevent="store.addCheckin">
-        <label>
-          <span>科目</span>
-          <input v-model="store.checkinSubject" placeholder="数学" />
-        </label>
-        <label>
-          <span>时长/分钟</span>
-          <input v-model.number="store.checkinMinutes" type="number" min="1" />
-        </label>
-        <button type="submit" class="primary-action">Record check-in</button>
-      </form>
-
-      <div class="checkin-list">
-        <div v-for="(item, index) in store.checkins" :key="index">
-          <span>{{ item.subject }}</span>
-          <strong>{{ item.minutes }} 分钟</strong>
-        </div>
-      </div>
-    </aside>
+      </section>
+    </section>
   </main>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from 'vue'
-import CompanionSprite from './components/CompanionSprite.vue'
+import { reactive, ref } from 'vue'
+import StudyPetAvatar from './components/StudyPetAvatar.vue'
 import { useStudyStore } from './stores/useStudyStore'
 
+type PageId = 'home' | 'planning' | 'checkin' | 'growth'
+
 const store = useStudyStore()
-const focusMinutes = 25
-const remainingSeconds = ref(focusMinutes * 60)
-const timerRunning = ref(false)
-let timerId = 0
+const activePage = ref<PageId>('home')
+const showCelebration = ref(false)
 
-const visiblePlanItems = computed(() => {
-  if (store.planItems.length) return store.planItems.slice(0, 7)
-  return Array.from({ length: 5 }, (_, index) => ({
-    day: index + 1,
-    task: ['诊断当前基础', '整理核心概念', '完成专项练习', '订正易错题', '轻量复盘'][index],
-  }))
+const navItems: Array<{ id: PageId; label: string }> = [
+  { id: 'home', label: 'Today' },
+  { id: 'planning', label: 'Planning' },
+  { id: 'checkin', label: 'Check-in' },
+  { id: 'growth', label: 'Growth' },
+]
+
+const planner = reactive({
+  grade: 'Senior 3',
+  examDate: '2026-07-18',
+  targetScore: '620',
+  availableTime: '2.5 hours',
+  weakSubjects: 'Mathematics, Physics',
 })
 
-const weeklyProgress = computed(() => {
-  if (!store.planItems.length) return 18
-  const capped = Math.min(store.planItems.length, 7)
-  return Math.round((capped / 7) * 100)
-})
+const todayTasks = [
+  { name: 'Mathematics Review', time: '30 min', done: true },
+  { name: 'English Reading', time: '20 min', done: true },
+  { name: 'Physics Practice', time: '40 min', done: false },
+]
 
-const timerLabel = computed(() => {
-  const minutes = Math.floor(remainingSeconds.value / 60)
-  const seconds = remainingSeconds.value % 60
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-})
+const weeklyTrend = [42, 64, 58, 76, 72, 88, 66]
+const heatmapCells = [0, 1, 2, 3, 1, 0, 2, 4, 3, 2, 1, 0, 3, 4, 4, 2, 1, 3, 2, 0, 1, 4, 3, 2, 2, 1, 3, 4, 2, 1, 0, 3, 2, 4, 1]
 
-const timerProgress = computed(() => `${Math.round(((focusMinutes * 60 - remainingSeconds.value) / (focusMinutes * 60)) * 100)}%`)
+const weekPlan = [
+  { day: 'Monday', tasks: [{ title: 'Math concept review', meta: '45 min · algebra' }, { title: 'English reading', meta: '20 min · habit' }] },
+  { day: 'Tuesday', tasks: [{ title: 'Physics practice', meta: '40 min · weak point' }] },
+  { day: 'Wednesday', tasks: [{ title: 'Mistake reflection', meta: '30 min · calm review' }, { title: 'Vocabulary loop', meta: '15 min' }] },
+  { day: 'Thursday', tasks: [{ title: 'Mock section', meta: '60 min · timed' }] },
+  { day: 'Friday', tasks: [{ title: 'Formula recall', meta: '25 min' }, { title: 'Reading summary', meta: '20 min' }] },
+  { day: 'Saturday', tasks: [{ title: 'Full practice set', meta: '90 min · deep work' }] },
+  { day: 'Sunday', tasks: [{ title: 'Weekly reset', meta: '30 min · plan next week' }] },
+]
 
-function handlePetTap() {
-  if (!store.selected) {
-    store.selectCompanion(store.companionId)
-    return
-  }
-  store.openModule('chat')
+const achievements = [
+  { icon: '12', title: 'Study Streak', meta: '12 days in a row' },
+  { icon: '28', title: 'Completed Plans', meta: '28 plans finished' },
+  { icon: '6', title: 'Growth Badges', meta: '6 milestones unlocked' },
+]
+
+const abilities = [
+  { title: 'Learning Assistant', meta: 'Unlocked · asks better questions', locked: false },
+  { title: 'Study Reminder', meta: 'Unlocked · gentle nudges', locked: false },
+  { title: 'Learning Analysis', meta: 'Unlocks at Level 14', locked: true },
+  { title: 'Future Unlocks', meta: 'Deeper reports and rituals', locked: true },
+]
+
+const milestones = [
+  { level: 'Lv. 1', title: 'First Promise', reward: '+10 EXP' },
+  { level: 'Lv. 6', title: 'Steady Rhythm', reward: 'Reminder voice' },
+  { level: 'Lv. 12', title: 'Focused Companion', reward: 'Growth aura' },
+  { level: 'Lv. 14', title: 'Insight Partner', reward: 'Analysis unlock' },
+]
+
+function completeCheckin() {
+  store.addCheckin()
+  showCelebration.value = true
+  window.setTimeout(() => {
+    showCelebration.value = false
+  }, 1800)
 }
-
-function handleReselect() {
-  timerRunning.value = false
-  window.clearInterval(timerId)
-  store.reselectCompanion()
-}
-
-function toggleTimer() {
-  timerRunning.value = !timerRunning.value
-  store.companionAction = timerRunning.value ? 'focus' : 'idle'
-  if (!timerRunning.value) return
-  window.clearInterval(timerId)
-  timerId = window.setInterval(() => {
-    if (remainingSeconds.value <= 1) {
-      remainingSeconds.value = 0
-      timerRunning.value = false
-      window.clearInterval(timerId)
-      store.companionAction = 'happy'
-      return
-    }
-    remainingSeconds.value -= 1
-  }, 1000)
-}
-
-function resetTimer() {
-  timerRunning.value = false
-  remainingSeconds.value = focusMinutes * 60
-  window.clearInterval(timerId)
-  store.companionAction = store.activeModule === 'checkin' ? 'focus' : 'idle'
-}
-
-onBeforeUnmount(() => window.clearInterval(timerId))
 </script>

@@ -2,73 +2,124 @@
 
 ## Scope
 
-This document records the June 18, 2026 UI redesign for the StudyPet frontend.
+This document records the current premium StudyPet frontend design.
 
-The implementation focuses on the feasible parts of the provided design prompts:
+The interface now follows the requested product direction:
 
-- Premium light-mode dashboard with soft studio lighting.
-- Central animated pet avatar as the primary screen focus.
-- Frosted-glass bottom dock with three module entries.
-- AI Pet Chat panel connected to the backend mood/chat API.
-- Study Planner left drawer connected to the backend plan API.
-- Focus Tracker right overlay with local timer and check-in recording.
+- Apple Human Interface Design
+- Notion-like calm spacing
+- Arc-inspired light shell and tabs
+- Duolingo-style emotional reinforcement
+- modern SaaS clarity without enterprise heaviness
 
-No API key or secret is stored in the frontend.
+The experience is organized as four desktop pages:
+
+1. Home
+2. Planning
+3. Check-in
+4. Growth
 
 ## Files Changed
 
 - `frontend/src/App.vue`
-  - Rebuilt the page layout into a dashboard shell.
-  - Added the three module surfaces: chat sheet, planner drawer, and focus overlay.
-  - Added a local 25-minute countdown timer for the focus module.
-  - Preserved the existing Pinia store calls for chat, planning, pet selection, and check-in.
+  - Replaced the old avatar-selection flow with a page-based desktop shell.
+  - Added the four-page navigation model.
+  - Added top bar, hero stage, bottom cards, planning page, check-in page, and growth page.
+  - Wired StudyPet interactions to the existing Pinia store for chat, planning, and check-in.
+
+- `frontend/src/components/StudyPetAvatar.vue`
+  - New original StudyPet companion built in SVG/CSS.
+  - Includes breathing, floating particles, ambient aura, and reward labels.
+  - This replaces the earlier 3D/anime sprite approach for the current concept implementation.
 
 - `frontend/src/styles.css`
-  - Replaced the dark prototype styling with a light glassmorphism visual system.
-  - Added responsive behavior for desktop and mobile.
-  - Added visible focus states and `prefers-reduced-motion` support.
+  - New light glassmorphism system.
+  - Premium surface hierarchy, soft shadows, large whitespace, and responsive behavior.
+  - Animation support for breathing, floating rewards, celebration, and micro-interactions.
 
 ## Architecture
 
-### Central Pet Stage
+### Home Page
 
-The desktop pet remains the main interaction anchor. It is rendered by:
-
-```text
-App.vue
-  -> CompanionSprite.vue
-    -> canvas sprite animation from public/assets/companion/*
-```
-
-Pet state is controlled by `store.companionAction`:
-
-- `idle`: neutral state
-- `comfort`: chat/support state
-- `intro`: planning state
-- `focus`: study/check-in state
-- `happy`: successful check-in or timer completion
-
-Clicking the pet after companion confirmation opens the chat module.
-
-### Bottom Dock
-
-The dock has three fixed module entries:
-
-- `AI Pet Chat`
-- `Study Planner`
-- `Focus Tracker`
-
-Each button calls `store.openModule(moduleName)`. The active module controls which glass panel is visible.
-
-### Chat Module
-
-UI location:
+The home page uses a three-zone structure:
 
 ```text
-Right-bottom floating sheet
+Top bar
+Hero area
+Bottom functional cards
 ```
 
-State and API path:
+Hero composition:
+
+- Left: speech bubble + pet information card
+- Center: large StudyPet avatar on a floating platform
+- Right: AI chat panel
+
+Bottom functional cards:
+
+- Today’s Study Plan
+- Today’s Learning Overview
+- Study Calendar
+
+### Planning Page
+
+The planning page uses:
+
+- Left sidebar for roadmap context
+- Center weekly timeline
+- Right AI planning assistant form
+
+The center timeline is intentionally card-based and wide, with seven day columns to support a calm roadmap feel.
+
+### Check-in Page
+
+The check-in page uses:
+
+- Top streak hero
+- Center check-in call-to-action with celebration effect
+- Bottom statistics row
+- Right study calendar heatmap
+
+The check-in action uses local state and the existing store check-in behavior.
+
+### Growth Page
+
+The growth page uses:
+
+- Left achievements panel
+- Center evolution stage with the StudyPet avatar
+- Right unlocked abilities panel
+- Bottom growth timeline
+
+This page is designed to feel emotional and companion-like rather than analytical.
+
+## Companion Asset Strategy
+
+The current implementation uses a custom SVG/CSS companion instead of the old imported sprite characters.
+
+Why this choice was made:
+
+- It guarantees a stable premium look without depending on external art assets.
+- It fits the current objective of a concept-first, controllable front-end.
+- It is easy to replace later with generated bitmap art or a manually designed illustration.
+
+If you later want to swap in generated image art:
+
+- Replace `frontend/src/components/StudyPetAvatar.vue`
+- Keep the page layout and card system unchanged
+- Preserve the hero platform, aura, and reward layers around the new asset
+
+Recommended replacement path:
+
+- Render or generate a single centered companion asset.
+- Match the current pastel blue/purple palette.
+- Keep the silhouette simple enough to work in the hero shell.
+
+## State and Data Flow
+
+The frontend still uses the existing store for conversational and planning actions.
+
+### Chat
 
 ```text
 store.runMood()
@@ -76,17 +127,7 @@ store.runMood()
   -> POST /api/mood/check
 ```
 
-The module keeps the existing `chatHistory` behavior and sends recent context to the backend.
-
-### Study Planner Module
-
-UI location:
-
-```text
-Left slide-in drawer
-```
-
-State and API path:
+### Study Plan
 
 ```text
 store.runPlan()
@@ -94,116 +135,72 @@ store.runPlan()
   -> POST /api/plan/generate
 ```
 
-The drawer contains:
-
-- Goal form fields.
-- A weekly progress indicator.
-- Editable daily task timeline.
-- Optional weekly plan summaries when returned by the backend.
-
-The default timeline shown before API generation is local placeholder UI only. Generated API results replace it through `store.planItems`.
-
-### Focus Tracker Module
-
-UI location:
+### Check-in
 
 ```text
-Right-side overlay
+store.addCheckin()
+  -> local state update
 ```
-
-Behavior:
-
-- 25-minute local countdown timer.
-- Start, pause, and reset controls.
-- Local subject/minutes check-in through `store.addCheckin()`.
-- Displays streak days and today's total study minutes from Pinia state.
-
-This module intentionally does not call the API.
 
 ## Design System
 
 ### Palette
 
-- Ink: `#172033`
-- Muted text: `#687386`
-- Frosted surface: `rgba(255, 255, 255, 0.58)`
-- Primary blue: `#2563EB`
-- Accent lime: `#A3E635`
-- Background: light cream to cool grey gradient
+- Primary: `#6366F1`
+- Secondary: `#A5B4FC`
+- Background: `#F8FAFC`
+- Ink: `#111827`
+- Muted: `#64748B`
+- Surface: translucent white glass
 
 ### Layout
 
-The app uses a single-screen spatial model:
+The main home page is tuned for a 1440px desktop shell with:
 
-```text
-Top-left brand
-Center pet avatar stage
-Bottom glass dock
-Left planner drawer
-Right focus overlay
-Right-bottom chat sheet
-```
+- top navigation bar
+- center hero area
+- bottom functional area
 
-The pet avatar is deliberately not wrapped in a heavy card, so it feels like the live desktop companion rather than a decorative illustration.
+The pet is visually dominant and takes most of the attention in the composition.
 
-### Accessibility and UX Notes
+### Typography
 
-- Interactive controls use native `button`, `input`, and `textarea`.
-- Icon-only close buttons have `aria-label`.
-- Form fields have visible labels.
-- Keyboard focus states are visible.
-- Tap targets are generally at least 44px high.
-- Motion is reduced under `prefers-reduced-motion: reduce`.
-- Timer numbers use tabular figures to avoid layout jitter.
+The design uses a clean sans stack with no decorative face.
 
-## API Contracts Used
+Principles:
 
-The frontend still depends on:
+- readable
+- restrained
+- low contrast only where intentional
+- no playful novelty type
 
-```text
-POST /api/mood/check
-POST /api/plan/generate
-```
+## Accessibility and UX Notes
 
-The frontend base URL is read from:
-
-```text
-VITE_API_BASE_URL
-```
-
-Fallback:
-
-```text
-http://localhost:8000/api
-```
+- Buttons and inputs remain native elements.
+- Reduced motion is respected.
+- Focus rings are visible.
+- Layout collapses to a single column on smaller widths.
+- Celebration effects are non-blocking and purely decorative.
 
 ## Verification
 
-Frontend build command:
+Current verification:
 
 ```powershell
 cd E:\GIT-Projiects\Study-Pet\frontend
 npm run build
 ```
 
-Current result:
+Result:
 
-```text
-Build passed.
-```
+- Build passed successfully.
 
 Known warning:
 
-```text
-Some chunks are larger than 500 kB after minification.
-```
+- Vite reports a bundle-size warning due to existing dependencies.
 
-This is a bundle-size warning, not a functional error. It can be optimized later with code splitting or by reviewing unused dependencies.
+## Future Work
 
-## Future Review Checklist
-
-- Confirm pet sprite framing for all five companions on desktop and mobile.
-- Test chat with the deployed backend URL in `VITE_API_BASE_URL`.
-- Test plan generation with real backend responses containing `plan` and `weekly_plan`.
-- Confirm Render backend is using Python 3.12.x.
-- Consider splitting frontend chunks if production load time becomes slow.
+- Replace the SVG companion with a generated bitmap or externally designed avatar if you decide to use image generation later.
+- Split the large frontend bundle if production load time becomes an issue.
+- Connect more of the growth page to real backend reports when ready.
