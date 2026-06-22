@@ -39,3 +39,56 @@ class DailyReportRequest(BaseUserRequest):
 
 class WeeklyReportRequest(BaseUserRequest):
     scope: str = "weekly"
+
+
+class ImageGenerateRequest(BaseUserRequest):
+    prompt: str
+    style: str = "premium cute ai companion"
+    aspect_ratio: str = "1:1"
+    provider: str | None = None
+
+
+class ImageGenerateResponse(BaseModel):
+    image_url: str | None = None
+    b64_json: str | None = None
+    provider: str
+    status: str
+
+
+class TTSRequest(BaseUserRequest):
+    text: str
+    voice: str | None = None
+    provider: str | None = None
+
+
+class TTSResponse(BaseModel):
+    audio_base64: str
+    provider: str
+    status: str
+
+
+class ASRResponse(BaseModel):
+    text: str
+    provider: str
+    status: str
+
+
+class DocumentParseResponse(BaseModel):
+    filename: str
+    content_type: str
+    text: str
+    word_count: int
+    status: str = "success"
+
+
+class InteractiveGenerateRequest(BaseUserRequest):
+    type: str = "mindmap"
+    topic: str = ""
+    source_text: str = ""
+    plan_items: list[dict] = []
+
+
+class InteractiveCompleteRequest(BaseUserRequest):
+    activity_id: str
+    type: str = "mindmap"
+    completed_steps: list[str] = []

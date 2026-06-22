@@ -51,7 +51,28 @@ VITE_API_BASE_URL=http://localhost:8000/api
 Recommended:
 
 - Backend: Render
-- Frontend: Vercel
+- Frontend: GitHub Pages or Vercel
+
+### Public Frontend
+
+This repository includes a GitHub Actions workflow for GitHub Pages:
+
+```text
+.github/workflows/deploy-frontend.yml
+```
+
+After pushing to `main` and enabling GitHub Pages with "GitHub Actions" as the source, the public site is:
+
+```text
+https://zuolexiansheng.github.io/Study-Pet/
+```
+
+The workflow builds the Vue frontend with:
+
+```env
+VITE_BASE_PATH=/Study-Pet/
+VITE_API_BASE_URL=https://study-pet-api.onrender.com/api
+```
 
 ### Render Backend
 

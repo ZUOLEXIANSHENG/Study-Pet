@@ -5,7 +5,7 @@ from typing import Any, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
-from app.core.settings import get_settings
+from app.providers.manager import ProviderManager
 
 OutputModel = TypeVar("OutputModel", bound=BaseModel)
 
@@ -15,12 +15,13 @@ class LLMUnavailable(RuntimeError):
 
 
 class LLMClient:
-    def __init__(self) -> None:
-        self.settings = get_settings()
+    def __init__(self, provider_id: str | None = None) -> None:
+        self.provider_id = provider_id
+        self.provider_manager = ProviderManager()
 
     @property
     def enabled(self) -> bool:
-        return bool(self.settings.llm_api_key)
+        return self.provider_manager.get_llm_provider(self.provider_id).enabled
 
     def complete_json(
         self,
@@ -38,13 +39,14 @@ class LLMClient:
         except ImportError as exc:
             raise LLMUnavailable("openai package is not installed") from exc
 
+        provider = self.provider_manager.get_llm_provider(self.provider_id)
         client = OpenAI(
-            api_key=self.settings.llm_api_key,
-            base_url=self.settings.llm_base_url,
-            timeout=self.settings.llm_timeout_seconds,
+            api_key=provider.api_key,
+            base_url=provider.base_url,
+            timeout=provider.timeout_seconds,
         )
         response = client.chat.completions.create(
-            model=self.settings.llm_model,
+            model=provider.model,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {

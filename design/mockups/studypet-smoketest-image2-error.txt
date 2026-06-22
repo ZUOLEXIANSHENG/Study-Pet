@@ -1,0 +1,9 @@
+﻿Invoke-RestMethod : {"error":{"message":"Upstream service temporarily unavailable","type":"upstream_error","param":"","
+code":null}}
+At line:9 char:15
++ ... $response = Invoke-RestMethod -Method Post -Uri 'https://imgapi.zjapi ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-RestMethod], WebExc 
+   eption
+    + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand
+

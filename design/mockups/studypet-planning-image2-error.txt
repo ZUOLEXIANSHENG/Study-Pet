@@ -1,0 +1,8 @@
+﻿Invoke-RestMethod : {"error":{"message":"Upstream request failed","type":"upstream_error","param":"","code":null}}
+At line:21 char:15
++ ... $response = Invoke-RestMethod -Method Post -Uri 'https://imgapi.zjapi ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-RestMethod], WebExc 
+   eption
+    + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand
+
