@@ -71,7 +71,7 @@ The workflow builds the Vue frontend with:
 
 ```env
 VITE_BASE_PATH=/Study-Pet/
-VITE_API_BASE_URL=https://study-pet-api.onrender.com/api
+VITE_API_BASE_URL=https://study-pet-1.onrender.com/api
 ```
 
 ### Render Backend
